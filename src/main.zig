@@ -13,7 +13,7 @@ pub fn main() anyerror!void {
     const data = try readFile(name);
 
     const actions = try parser.parse(data);
-    bf.run(actions);
+    try bf.run(actions);
 }
 
 fn readFile(name: []const u8) anyerror![]u8 {
