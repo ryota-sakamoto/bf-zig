@@ -15,6 +15,7 @@ pub const Type = union(enum) {
 
 pub fn run(actions: []Type) anyerror!void {
     const stdout = std.io.getStdOut().writer();
+    const stdin = std.io.getStdIn().reader();
 
     var data = std.ArrayList(u8).init(allocator);
     defer data.deinit();
@@ -34,7 +35,10 @@ pub fn run(actions: []Type) anyerror!void {
             .ValueIncrement => data.items[pointerIndex] += 1,
             .ValueDecrement => data.items[pointerIndex] -= 1,
             .Print => try stdout.print("{c}", .{data.items[pointerIndex]}),
-            .Read => {},
+            .Read => {
+                const in = try stdin.readByte();
+                data.items[pointerIndex] = in;
+            },
             .WhileStart => {
                 if (data.items[pointerIndex] == 0) {
                     actionIndex = v.WhileStart.end;
