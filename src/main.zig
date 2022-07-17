@@ -1,4 +1,6 @@
 const std = @import("std");
+const parser = @import("parser.zig");
+const bf = @import("bf.zig");
 
 pub fn main() anyerror!void {
     if (std.os.argv.len < 2) {
@@ -7,14 +9,11 @@ pub fn main() anyerror!void {
         std.os.exit(1);
     }
 
-    for (std.os.argv) |arg, i| {
-        std.log.info("arg{d}: {s}", .{i, arg});
-    }
-
     const name: []const u8 = std.os.argv[1][0..strlen(std.os.argv[1])];
-    const buf = try readFile(name);
+    const data = try readFile(name);
 
-    std.log.info("{s}", .{buf});
+    const actions = try parser.parse(data);
+    bf.run(actions);
 }
 
 fn readFile(name: []const u8) anyerror![]u8 {
@@ -28,7 +27,7 @@ fn readFile(name: []const u8) anyerror![]u8 {
     const last = try stream.readAll(&buf);
 
     return buf[0..last];
-} 
+}
 
 fn strlen(ptr: [*]const u8) usize {
     var count: usize = 0;
